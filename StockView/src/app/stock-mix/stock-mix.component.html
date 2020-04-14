@@ -1,0 +1,18 @@
+<div style="border:dashed red 1px;margin:0.5em;padding:0.5em" (window:resize)="onResize($event)" (window:load)="onLoad($event)">
+
+  <div *ngIf="chart.loaded">
+    <google-chart width="{{ chart.width }}"
+                  [title]="chart.title"
+                  [type]="chart.type"
+                  [data]="chart.data"
+                  [columnNames]="chart.columnNames"
+                  [options]="chart.options">
+      <!--(ready)="onReady()"
+    (select)="onSelect($event)"
+    (error)="onError($event)"
+    (mouseenter)="onMouseEnter($event)"
+    (mouseleave)="onMouseLeave($event)"
+    >-->
+    </google-chart>
+  </div>
+</div>
