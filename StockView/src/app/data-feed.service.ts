@@ -114,6 +114,7 @@ export class DataFeedService {
     if (!data.chart.result) { chrtCmpt.chart.data = null; return; }
     let ts = data['chart']['result'][0]['timestamp']; //timestamps
     let prc = data['chart']['result'][0]['indicators']['adjclose'][0]['adjclose']; //close price
+    let vol = data['chart']['result'][0]['indicators']['quote'][0]['volume'];
     const zip = (a1, a2) => a1.map((v1, i) => [this.getDateMonthDay(v1), parseFloat(a2[i])]);
     let stkData = zip(ts, prc);
     chrtCmpt.stockData = zip(ts, prc);
@@ -124,11 +125,14 @@ export class DataFeedService {
       if (x[1] > chrtCmpt.chart.maxVal) chrtCmpt.chart.maxVal = x[1];
       if (x[1] < chrtCmpt.chart.minVal) chrtCmpt.chart.minVal = x[1];
     }
+    let totVol = 0.0; //all days
+    for (let x of vol)
+      totVol += parseInt(vol);
+    chrtCmpt.chart.avgVol = totVol / vol.length;
     chrtCmpt.chart.last = stkData[stkData.length - 1][1];
     chrtCmpt.chart.factor = chrtCmpt.chart.maxVal / chrtCmpt.chart.last;
     chrtCmpt.chart.chg = stkData[stkData.length - 1][1] - stkData[stkData.length - 2][1];
-    chrtCmpt.chart.chg = stkData[stkData.length - 1][1] - stkData[stkData.length - 2][1];
-    chrtCmpt.chart.chgPct = chrtCmpt.chart.chg / stkData[stkData.length - 1][1] * 100.0;
+    chrtCmpt.chart.chgPct = chrtCmpt.chart.chg / stkData[stkData.length - 2][1] * 100.0;
     chrtCmpt.chart.lastTime = this.getTime(ts[ts.length - 1]);
     chrtCmpt.chart.title = chrtCmpt.stockName + '  ' + chrtCmpt.chart.last.toFixed(2) + '  (' + chrtCmpt.chart.minVal.toFixed(2) + ' - ' + chrtCmpt.chart.maxVal.toFixed(2) + ')';
     if (this.urlParams.has('baseline'))
@@ -178,7 +182,7 @@ export class DataFeedService {
     chrtCmpt.stockData = stkData;
     chrtCmpt.chart.data = stkData; //this.stockData;
     chrtCmpt.chart.maxVal = 100.0;  //parseFloat(stkData[0][1]);
-    chrtCmpt.chart.minVal = parseFloat(stkData[0][1]);
+   // chrtCmpt.chart.minVal = parseFloat(stkData[0][1]);
     for (let x of stkData) {
       if (x[1] > chrtCmpt.chart.maxVal) chrtCmpt.chart.maxVal = x[1];
       if (x[1] < chrtCmpt.chart.minVal) chrtCmpt.chart.minVal = x[1];
@@ -198,8 +202,8 @@ export class DataFeedService {
     avgLast = totals[totals.length-1] / (stkData[stkData.length - 1].length - 1.0);
     chrtCmpt.chart.last = avgLast;  // parseFloat(stkData[stkData.length - 1][1]);
     chrtCmpt.factor = 100.0 / avgLast; //assume normalized
-    chrtCmpt.chart.chg = (totals[totals.length - 1] - totals[totals.length - 2]);
-    chrtCmpt.chart.chgPct = chrtCmpt.chart.chg / stkData[stkData.length - 1][1] * 100.0;
+    chrtCmpt.chart.chg = (totals[totals.length - 1] - totals[totals.length - 2]) / (stkData[stkData.length - 1].length - 1.0);
+    chrtCmpt.chart.chgPct = chrtCmpt.chart.chg / (totals[totals.length-2]/(stkData[stkData.length - 1].length - 1.0)) * 100.0;
     chrtCmpt.chart.lastTime = this.getTime(ts[ts.length - 1]);
     chrtCmpt.chart.title = chrtCmpt.chart.last.toFixed(2) + '  (' + chrtCmpt.chart.minVal.toFixed(2) + ' - ' + chrtCmpt.chart.maxVal.toFixed(2) + ')';
     //ttl; //chrtCmpt.stockName + '  ' + chrtCmpt.chart.last.toFixed(2) + '  (' + chrtCmpt.chart.minVal.toFixed(2) + ' - ' + chrtCmpt.chart.maxVal.toFixed(2) + ')';
