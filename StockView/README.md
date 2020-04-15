@@ -3,6 +3,7 @@
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.1.0.
 
 After deployment, StockView page can be launched with parameters:
+
 http://www.YourSite.com/StockView/?range=6&refresh=5&baseline=0&stocks=DIA,SPY,QQQ,AAPL,MSFT
 
 Parameters:
@@ -15,6 +16,8 @@ To deploy into a site subfolder, use the base-href option:
 ng build --prod --base-href=/StockView/
 
 First chart combines all stocks into a normalized (0-100) range.
+
+The charts are from Google Charts (line chart) using the angular-google-charts library.
 
 ## Development server
 
