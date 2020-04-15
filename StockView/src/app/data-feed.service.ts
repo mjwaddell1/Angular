@@ -67,10 +67,11 @@ export class DataFeedService {
     return Promise.all(promiseList).then(res => { res.map((r, i) => results.push(r)); return Promise.resolve(results); });
   }
 
-  public getStockDataDaily(stk: string, moCnt: number): Promise<any> {
+  public getStockDataDaily(stk: string, rng: number): Promise<any> {
     console.log('getStockDataDaily');
+    let unit = rng > 0 ? 'mo' : 'd'; //if negative, then days
     //let apiURL = `https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${moCnt}mo&interval=1d&indicators=quote&includeTimestamps=true`;
-    let apiURL = `http://clicktocontinue.com/getwebdata.asp?https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${moCnt}mo&interval=1d&indicators=quote&includeTimestamps=true`;
+    let apiURL = `http://clicktocontinue.com/getwebdata.asp?https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${Math.abs(rng)}${unit}&interval=1d&indicators=quote&includeTimestamps=true`;
     let promise = new Promise((resolve, reject) => {
       this.http.get(apiURL)
         .toPromise()
@@ -78,7 +79,7 @@ export class DataFeedService {
         res => { // Success
           //console.log(res['chart']['result'][0]['timestamp'][0]);
           //console.log(res['chart']['result'][0]['indicators']['adjclose'][0]['adjclose'][0]);
-            resolve({ stockName:stk, moCnt: moCnt, stockData: res });
+            resolve({ stockName:stk, range: rng, stockData: res });
           },
           msg => { // Error
             console.log("ERROR:" + msg);
