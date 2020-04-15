@@ -35,6 +35,7 @@ export class StockComponent implements OnInit {
     height: 1500,
     maxVal: 0.0, minVal: 0.0, last: 0.0, chg: 0.0, chgPct: 0.0, lastTime: '**',
     factor: 0.0,
+    avgVol: 0.0,
     loaded: false
   };
 
