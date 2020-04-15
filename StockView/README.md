@@ -2,17 +2,16 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.1.0.
 
-After deployment, StockView page can be launched with parameters:
-
+After deployment, StockView page can be launched with parameters:    
 http://www.YourSite.com/StockView/?range=6&refresh=5&baseline=0&stocks=DIA,SPY,QQQ,AAPL,MSFT
 
-Parameters:
-  range=6         <- Default range 6 months
-  refresh=5       <- Refresh data every 5 minutes
-  baseline=0      <- Chart Y-axis begins at zero
-  stocks=DIA,SPY  <- Stocks to display
+Parameters:    
+&nbsp;&nbsp;&nbsp;&nbsp;range=6         <-- Default range 6 months   
+&nbsp;&nbsp;&nbsp;&nbsp;refresh=5       <-- Refresh data every 5 minutes   
+&nbsp;&nbsp;&nbsp;&nbsp;baseline=0      <-- Chart Y-axis begins at zero    
+&nbsp;&nbsp;&nbsp;&nbsp;stocks=DIA,SPY  <-- Stocks to display    
 
-To deploy into a site subfolder, use the base-href option:
+To deploy into a site subfolder, use the base-href option:    
 `ng build --prod --base-href=/StockView/`
 
 First chart combines all stocks into a normalized (0-100) range.
