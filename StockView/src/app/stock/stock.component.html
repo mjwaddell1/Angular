@@ -1,7 +1,7 @@
 <div style="border:dashed red 1px;margin:0.5em;padding:0.5em" (window:resize)="onResize($event)" (window:load)="onLoad($event)">
 
   <div *ngIf="chart.title && chart.title[0] !== '!'">
-    <b><span>{{ chart.title }}</span>&nbsp;&nbsp;&nbsp;<span style="color: {{ chart.chg < 0.0 ? 'maroon' : 'forestgreen' }}">{{ chart.chg.toFixed(2) }}&nbsp;&nbsp;{{ chart.chgPct.toFixed(2) }}%</span></b>&nbsp;&nbsp;&nbsp;{{ chart.lastTime }}
+    <b><span>{{ chart.title }}</span>&nbsp;&nbsp;&nbsp;<span style="color: {{ chart.chg < 0.0 ? 'maroon' : 'forestgreen' }}">{{ chart.chg.toFixed(2) }}&nbsp;&nbsp;{{ chart.chgPct.toFixed(2) }}%</span>&nbsp;&nbsp;&nbsp;{{ chart.factor.toFixed(2) }}x</b>&nbsp;&nbsp;&nbsp;{{ chart.lastTime }}
 
     <google-chart width="{{ chart.width }}"
                   [type]="chart.type"
@@ -9,11 +9,11 @@
                   [columnNames]="chart.columnNames"
                   [options]="chart.options">
       <!--(ready)="onReady()"
-      (select)="onSelect($event)"
-      (error)="onError($event)"
-      (mouseenter)="onMouseEnter($event)"
-      (mouseleave)="onMouseLeave($event)"
-      >-->
+    (select)="onSelect($event)"
+    (error)="onError($event)"
+    (mouseenter)="onMouseEnter($event)"
+    (mouseleave)="onMouseLeave($event)"
+    >-->
     </google-chart>
   </div>
 
