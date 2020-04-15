@@ -20,7 +20,7 @@ export class StockMixComponent implements OnInit {
     columnNames: ['Price',...this.feed.stocks],   //['Price', 'MFA', 'NCLH', 'CHEF'],
     options: {
       legend: { position: 'top' },
-      title: { position: 'none' },
+      title: { position: 'top' },
       chartArea: { left: 50, right: 5 },
       hAxis: { gridLines: { color: '#333', minSpacing: 20 } },
       vAxis: { baseline: null },
@@ -28,7 +28,8 @@ export class StockMixComponent implements OnInit {
     },
     width: 1000,
     height: 1500,
-    maxVal: 0, minVal: 0, last: 0,
+    maxVal: 0.0, minVal: 0.0, last: 0.0, chg: 0.0, chgPct: 0.0, lastTime: '**',
+    factor: 0.0,
     loaded: false
   };
 
