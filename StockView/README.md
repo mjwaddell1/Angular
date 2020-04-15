@@ -16,7 +16,7 @@ To deploy into a site subfolder, use the base-href option:
 
 First chart combines all stocks into a normalized (0-100) range.
 
-The charts are from Google Charts (line chart) using the angular-google-charts library.
+The charts are from Google Charts (line chart) using the [angular-google-charts](https://github.com/FERNman/angular-google-charts) library.
 
 ## Development server
 
