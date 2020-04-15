@@ -6,10 +6,10 @@ After deployment, StockView page can be launched with parameters:
 http://www.YourSite.com/StockView/?range=6&refresh=5&baseline=0&stocks=DIA,SPY,QQQ,AAPL,MSFT
 
 Parameters:    
-&nbsp;&nbsp;&nbsp;&nbsp;range=6         <-- Default range 6 months   
-&nbsp;&nbsp;&nbsp;&nbsp;refresh=5       <-- Refresh data every 5 minutes   
-&nbsp;&nbsp;&nbsp;&nbsp;baseline=0      <-- Chart Y-axis begins at zero    
-&nbsp;&nbsp;&nbsp;&nbsp;stocks=DIA,SPY  <-- Stocks to display    
+&nbsp;&nbsp;&nbsp;&nbsp;range=6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<-- Default range 6 months   
+&nbsp;&nbsp;&nbsp;&nbsp;refresh=5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<-- Refresh data every 5 minutes   
+&nbsp;&nbsp;&nbsp;&nbsp;baseline=0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<-- Chart Y-axis begins at zero    
+&nbsp;&nbsp;&nbsp;&nbsp;stocks=DIA,SPY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<-- Stocks to display    
 
 To deploy into a site subfolder, use the base-href option:    
 `ng build --prod --base-href=/StockView/`
