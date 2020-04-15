@@ -125,6 +125,7 @@ export class DataFeedService {
       if (x[1] < chrtCmpt.chart.minVal) chrtCmpt.chart.minVal = x[1];
     }
     chrtCmpt.chart.last = stkData[stkData.length - 1][1];
+    chrtCmpt.chart.factor = chrtCmpt.chart.maxVal / chrtCmpt.chart.last;
     chrtCmpt.chart.chg = stkData[stkData.length - 1][1] - stkData[stkData.length - 2][1];
     chrtCmpt.chart.chg = stkData[stkData.length - 1][1] - stkData[stkData.length - 2][1];
     chrtCmpt.chart.chgPct = chrtCmpt.chart.chg / stkData[stkData.length - 1][1] * 100.0;
@@ -170,18 +171,39 @@ export class DataFeedService {
         }
     }
 
+    let totals: number[] = [];
+    let totLast = 0.0;
+    let avgLast = 0.0;
     chrtCmpt.columnNames = colNames; //does not work
     chrtCmpt.stockData = stkData;
     chrtCmpt.chart.data = stkData; //this.stockData;
-    chrtCmpt.chart.maxVal = parseFloat(stkData[0][1]);
+    chrtCmpt.chart.maxVal = 100.0;  //parseFloat(stkData[0][1]);
     chrtCmpt.chart.minVal = parseFloat(stkData[0][1]);
     for (let x of stkData) {
       if (x[1] > chrtCmpt.chart.maxVal) chrtCmpt.chart.maxVal = x[1];
       if (x[1] < chrtCmpt.chart.minVal) chrtCmpt.chart.minVal = x[1];
     }
-    chrtCmpt.chart.last = parseFloat(stkData[stkData.length - 1][1]);
+    //find min of portfolio
+    let totMin = 99999999.0;
+    for (let r = 0; r < stkData.length; r++) {
+      let totRow = 0.0;
+      for (let i = 1; i < stkData[r].length; i++) {
+        totRow += stkData[r][i];
+      }
+      totals[r] = totRow; //sum all stocks
+      if (totRow < totMin) totMin = totRow;
+    }
+    chrtCmpt.chart.minVal = totMin / (stkData[0].length - 1);
+
+    avgLast = totals[totals.length-1] / (stkData[stkData.length - 1].length - 1.0);
+    chrtCmpt.chart.last = avgLast;  // parseFloat(stkData[stkData.length - 1][1]);
+    chrtCmpt.factor = 100.0 / avgLast; //assume normalized
+    chrtCmpt.chart.chg = (totals[totals.length - 1] - totals[totals.length - 2]);
+    chrtCmpt.chart.chgPct = chrtCmpt.chart.chg / stkData[stkData.length - 1][1] * 100.0;
     chrtCmpt.chart.lastTime = this.getTime(ts[ts.length - 1]);
-    chrtCmpt.chart.title = ttl; //chrtCmpt.stockName + '  ' + chrtCmpt.chart.last.toFixed(2) + '  (' + chrtCmpt.chart.minVal.toFixed(2) + ' - ' + chrtCmpt.chart.maxVal.toFixed(2) + ')';
+    chrtCmpt.chart.title = chrtCmpt.chart.last.toFixed(2) + '  (' + chrtCmpt.chart.minVal.toFixed(2) + ' - ' + chrtCmpt.chart.maxVal.toFixed(2) + ')';
+    //ttl; //chrtCmpt.stockName + '  ' + chrtCmpt.chart.last.toFixed(2) + '  (' + chrtCmpt.chart.minVal.toFixed(2) + ' - ' + chrtCmpt.chart.maxVal.toFixed(2) + ')';
+    chrtCmpt.chart.factor = 100.0 / avgLast;
     if (this.urlParams.has('baseline'))
       chrtCmpt.chart.options.vAxis.baseline = parseInt(this.urlParams.get('baseline'));
  }
