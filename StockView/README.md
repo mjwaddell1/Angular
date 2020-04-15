@@ -13,7 +13,7 @@ Parameters:
   stocks=DIA,SPY  <- Stocks to display
 
 To deploy into a site subfolder, use the base-href option:
-ng build --prod --base-href=/StockView/
+`ng build --prod --base-href=/StockView/`
 
 First chart combines all stocks into a normalized (0-100) range.
 
