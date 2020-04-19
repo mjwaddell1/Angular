@@ -1,31 +1,39 @@
 /* You can add global styles to this file, and also import other style files */
 
-.btn-rng {
+.btn-rngXX {
   padding: 1px 5px 1px 5px;
   margin: 2px;
   border-color: darkgray;
   background-color: lightsteelblue;
+  box-shadow: none;
 }
 
-  .btn-rng:hover {
+.btn-rng {
+  padding: 1px 5px 1px 5px;
+  margin: 2px;
+  box-shadow: none;
+}
+
+  .btn-rngXX:hover {
     background-color: palevioletred;
     border-color: darkgray;
+    box-shadow: none;
   }
 
-  .btn-rng:focus {
+  .btn-rngXX:focus {
     background-color: palevioletred;
     border-color: darkgray;
+    box-shadow: none;
   }
 
-  .btn-rng:active {
+  .btn-rngXX:active {
     background-color: palevioletred;
     border-color: darkgray;
+    box-shadow: none;
   }
 
 .btn-active {
   background-color: indianred;
   border-color: darkgray;
+  box-shadow: none;
 }
-
-
-
