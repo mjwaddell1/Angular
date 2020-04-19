@@ -16,8 +16,8 @@
   </table>
 </div>
 
-<center>
-  <div *ngIf="showSettings" style="background-color:peachpuff;padding:10px;margin:20px;border-radius:5px;" class="form-style-2">
+<div style="text-align:center;">
+  <div *ngIf="showSettings" style="background-color:peachpuff;padding:10px;margin:20px;border-radius:5px;display:inline-block;" class="form-style-2">
     <table>
       <tr>
         <td>
@@ -52,8 +52,8 @@
             </tr>
           </table>
         </td>
-        <td><input type="button" value="Update Link" style="margin-left:30px" (click)="updateLink()"/></td>
+        <td><input type="button" value="Update Link" style="margin-left:30px" (click)="updateLink()" /></td>
       </tr>
     </table>
   </div>
-</center>
+</div>
