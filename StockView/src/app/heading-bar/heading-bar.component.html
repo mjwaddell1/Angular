@@ -11,7 +11,7 @@
         <input type="button" class="btn btn-sm btn-rng" [ngClass]="{ 'btn-danger':this.rg === 1,  'btn-outline-danger':this.rg !==  1 }" value="1 mo" (click)="updateData(1)" />
         <input type="button" class="btn btn-sm btn-rng" [ngClass]="{ 'btn-danger':this.rg === -5, 'btn-outline-danger':this.rg !== -5 }" value="5 dy" (click)="updateData(-5)" />
       </td>
-      <td align="right"><img [src]="showSettings ? '../../assets/gearOrange.png' : '../../assets/gear.png'" style="width:2em" (click)="showSettings = !showSettings" /></td>
+      <td align="right"><img [src]="showSettings ? 'assets/gearOrange.png' : 'assets/gear.png'" style="width:2em" (click)="showSettings = !showSettings" /></td>
     </tr>
   </table>
 </div>
