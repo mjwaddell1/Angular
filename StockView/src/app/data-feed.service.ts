@@ -16,6 +16,7 @@ export class DataFeedService {
   public stocks: string[] = ['MFA', 'NCLH', 'ERI', 'SPY'];
   public range: number = 6;  //months
   public refreshRate: number = 10; //minutes
+  public baseline: number = 0; //chart bottom
   public urlParams: any;
   public lineColors = ['BlueViolet', 'ForestGreen', 'IndianRed', 'DarkCyan', 'DarkOliveGreen', 'DarkOrchid', 'Brown', 'DarkOrange', 'DarkSlateBlue', 'DarkViolet', 'DarkSeaGreen','GoldenRod'];
 
@@ -39,6 +40,8 @@ export class DataFeedService {
       this.range = parseInt(this.urlParams.get('range'));
     if (this.urlParams.has('refresh'))
       this.refreshRate = parseInt(this.urlParams.get('refresh'));
+    if (this.urlParams.has('baseline'))
+      this.baseline = parseInt(this.urlParams.get('baseline'));
 
     //set refresh
     if (this.refreshRate > 0)
@@ -136,8 +139,7 @@ export class DataFeedService {
     chrtCmpt.chart.chgPct = chrtCmpt.chart.chg / stkData[stkData.length - 2][1] * 100.0;
     chrtCmpt.chart.lastTime = this.getTime(ts[ts.length - 1]);
     chrtCmpt.chart.title = chrtCmpt.stockName + '  ' + chrtCmpt.chart.last.toFixed(2) + '  (' + chrtCmpt.chart.minVal.toFixed(2) + ' - ' + chrtCmpt.chart.maxVal.toFixed(2) + ')';
-    if (this.urlParams.has('baseline'))
-      chrtCmpt.chart.options.vAxis.baseline = parseInt(this.urlParams.get('baseline'));
+    chrtCmpt.chart.options.vAxis.baseline = this.baseline;
   }
 
   public parseJsonMulti(data, chrtCmpt, normalize = true): void {
@@ -209,8 +211,7 @@ export class DataFeedService {
     chrtCmpt.chart.title = chrtCmpt.chart.last.toFixed(2) + '  (' + chrtCmpt.chart.minVal.toFixed(2) + ' - ' + chrtCmpt.chart.maxVal.toFixed(2) + ')';
     //ttl; //chrtCmpt.stockName + '  ' + chrtCmpt.chart.last.toFixed(2) + '  (' + chrtCmpt.chart.minVal.toFixed(2) + ' - ' + chrtCmpt.chart.maxVal.toFixed(2) + ')';
     chrtCmpt.chart.factor = 100.0 / avgLast;
-    if (this.urlParams.has('baseline'))
-      chrtCmpt.chart.options.vAxis.baseline = parseInt(this.urlParams.get('baseline'));
+    chrtCmpt.chart.options.vAxis.baseline = this.baseline;
  }
 
   getDateMonthDay(epoch: number): string {
