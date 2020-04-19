@@ -1,8 +1,59 @@
-<p class="navbar navbar-light" style="background-color: lightsteelblue">Stock View</p>
-&nbsp;&nbsp;
-<input type="button" class="btn btn-primary btn-sm btn-rng" [ngClass]="{ 'btn-active':this.rg === 36 }" value="3 yr" (click)="updateData(36)" />
-<input type="button" class="btn btn-primary btn-sm btn-rng" [ngClass]="{ 'btn-active':this.rg === 12 }" value="1 yr" (click)="updateData(12)" />
-<input type="button" class="btn btn-primary btn-sm btn-rng" [ngClass]="{ 'btn-active':this.rg === 6 }" value="6 mo" (click)="updateData(6)" />
-<input type="button" class="btn btn-primary btn-sm btn-rng" [ngClass]="{ 'btn-active':this.rg === 3 }" value="3 mo" (click)="updateData(3)" />
-<input type="button" class="btn btn-primary btn-sm btn-rng" [ngClass]="{ 'btn-active':this.rg === 1 }" value="1 mo" (click)="updateData(1)" />
-<input type="button" class="btn btn-primary btn-sm btn-rng" [ngClass]="{ 'btn-active':this.rg === -5 }" value="5 dy" (click)="updateData(-5)" />
+<div class="navbar navbar-light" style="background-color: lightsteelblue">
+  <table style="width:100%">
+    <tr>
+      <td>
+        <b>Stock View</b>
+        &nbsp;&nbsp;
+        <input type="button" class="btn btn-sm btn-rng" [ngClass]="{ 'btn-danger':this.rg === 36, 'btn-outline-danger':this.rg !== 36 }" value="3 yr" (click)="updateData(36)" />
+        <input type="button" class="btn btn-sm btn-rng" [ngClass]="{ 'btn-danger':this.rg === 12, 'btn-outline-danger':this.rg !== 12 }" value="1 yr" (click)="updateData(12)" />
+        <input type="button" class="btn btn-sm btn-rng" [ngClass]="{ 'btn-danger':this.rg === 6,  'btn-outline-danger':this.rg !==  6 }" value="6 mo" (click)="updateData(6)" />
+        <input type="button" class="btn btn-sm btn-rng" [ngClass]="{ 'btn-danger':this.rg === 3,  'btn-outline-danger':this.rg !==  3 }" value="3 mo" (click)="updateData(3)" />
+        <input type="button" class="btn btn-sm btn-rng" [ngClass]="{ 'btn-danger':this.rg === 1,  'btn-outline-danger':this.rg !==  1 }" value="1 mo" (click)="updateData(1)" />
+        <input type="button" class="btn btn-sm btn-rng" [ngClass]="{ 'btn-danger':this.rg === -5, 'btn-outline-danger':this.rg !== -5 }" value="5 dy" (click)="updateData(-5)" />
+      </td>
+      <td align="right"><img [src]="showSettings ? '../../assets/gearOrange.png' : '../../assets/gear.png'" style="width:2em" (click)="showSettings = !showSettings" /></td>
+    </tr>
+  </table>
+</div>
+
+<center>
+  <div *ngIf="showSettings" style="background-color:peachpuff;padding:10px;margin:20px;border-radius:5px;" class="form-style-2">
+    <table>
+      <tr>
+        <td>
+          <table>
+            <tr><td>Stocks:</td><td colspan="5"><input type="text" id="txtStocks" [(ngModel)]="stks" style="width:100%" class="input-field" /></td></tr>
+            <tr><td style="height:3px"></td></tr>
+            <tr>
+              <td>Range:</td>
+              <td>
+                <select id="lstRange" [(ngModel)]="range" class="select-field" style="width">
+                  <option value="36">3 Years</option>
+                  <option value="12">1 Year</option>
+                  <option value="6">6 months</option>
+                  <option value="3">3 months</option>
+                  <option value="1">1 month</option>
+                  <option value="-5">5 days</option>
+                </select>
+              </td>
+              <td style="padding-left:10px">Refresh:</td>
+              <td>
+                <select id="lstRefresh" [(ngModel)]="refresh" class="select-field">
+                  <option value="15">15 minutes</option>
+                  <option value="10">10 minutes</option>
+                  <option value="5">5 minutes</option>
+                  <option value="1">1 minute</option>
+                </select>
+              </td>
+              <td style="padding-left:10px">Baseline:</td>
+              <td>
+                <input type="text" id="baseline" [(ngModel)]="baseline" style="width:50px" class="input-field" />
+              </td>
+            </tr>
+          </table>
+        </td>
+        <td><input type="button" value="Update Link" style="margin-left:30px" (click)="updateLink()"/></td>
+      </tr>
+    </table>
+  </div>
+</center>
