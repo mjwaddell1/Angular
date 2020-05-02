@@ -82,7 +82,7 @@ export class DataFeedService {
     console.log('getStockDataDaily');
     let unit = rng > 0 ? 'mo' : 'd'; //if negative, then days
     //let apiURL = `https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${moCnt}mo&interval=1d&indicators=quote&includeTimestamps=true`;
-    //let apiURL = `http://clicktocontinue.com/getwebdata.asp?https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${Math.abs(rng)}${unit}&interval=1d&indicators=quote&includeTimestamps=true`;
+    //let apiURL = `http://c-c.com/getwebdata.asp?https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${Math.abs(rng)}${unit}&interval=1d&indicators=quote&includeTimestamps=true`;
     let apiURL = `http://localhost:8080/?site=https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${Math.abs(rng)}${unit}%26interval=1d%26indicators=quote%26includeTimestamps=true`;
     let promise = new Promise((resolve, reject) => {
       this.http.get(apiURL)
