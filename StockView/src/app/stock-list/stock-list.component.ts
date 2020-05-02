@@ -10,9 +10,7 @@ export class StockListComponent implements OnInit {
 
   constructor(private feedsvc:DataFeedService) { }
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {  }
 
   getStockList = () => this.feedsvc.getStockList();
-
 }

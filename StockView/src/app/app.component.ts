@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { HeadingBarComponent } from './heading-bar/heading-bar.component';
+import { Title } from '@angular/platform-browser';
+import { DataFeedService } from './data-feed.service';
 
 
 @Component({
@@ -9,4 +10,11 @@ import { HeadingBarComponent } from './heading-bar/heading-bar.component';
 })
 export class AppComponent {
   title = 'StockView';
+
+  public constructor(private feedsvc: DataFeedService, private titleService: Title) {
+
+    this.feedsvc.titleEvent.subscribe((title) => {
+      this.titleService.setTitle(title.toString())
+    });
+  }
 }

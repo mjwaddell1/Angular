@@ -19,11 +19,12 @@ export class HeadingBarComponent implements OnInit {
 
   public updateData(rng) {
     console.log('updateData');
-    this.feedsvc.msgEvent.next(rng);
+    this.feedsvc.msgEvent.next(rng); //trigger observable
     this.rg = rng;
   }
 
   ngOnInit(): void {
+    //settings block
     this.stks = this.feedsvc.stocks.join(',');
     this.range = this.feedsvc.range;
     this.refresh = this.feedsvc.refreshRate;
@@ -31,7 +32,8 @@ export class HeadingBarComponent implements OnInit {
   }
 
   updateLink() {
-    document.location.href = document.location.pathname + '?range=' + this.range + '&refresh=' + this.refresh + '&baseline=' + this.baseline + '&stocks=' + this.stks;
+    //reload page
+    document.location.href = document.location.pathname + '?range=' + this.range + '&refresh=' + this.refresh + '&baseline=' + this.baseline + '&stocks=' + this.stks.replace(/ /g,'');
     this.showSettings = false;
   }
 

@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import { promise } from 'protractor';
 import { HttpClient } from '@angular/common/http';
-import { resolve } from 'url';
 import { Subject } from 'rxjs';
 
 @Injectable({
@@ -9,23 +7,26 @@ import { Subject } from 'rxjs';
 })
 export class DataFeedService {
 
-
   //http://localhost:4200/?stocks=DIA,SPY,QQQ&range=6&refresh=5&baseline=0
 
-
-  public stocks: string[] = ['MFA', 'NCLH', 'ERI', 'SPY'];
+  public stocks: string[] = ['DIA', 'SPY', 'QQQ', 'IWM']; //DOW, S&P500, Nasdaq, Russell 2k
   public range: number = 6;  //months
   public refreshRate: number = 10; //minutes
   public baseline: number = 0; //chart bottom
-  public urlParams: any;
-  public lineColors = ['BlueViolet', 'ForestGreen', 'IndianRed', 'DarkCyan', 'DarkOliveGreen', 'DarkOrchid', 'Brown', 'DarkOrange', 'DarkSlateBlue', 'DarkViolet', 'DarkSeaGreen','GoldenRod'];
+  public urlParams: any;  //chart settings
+  public lineColors = [  //chart colors rotate
+    'BlueViolet', 'ForestGreen', 'IndianRed', 'DarkCyan',
+    'DarkOliveGreen', 'DarkOrchid', 'Brown', 'DarkOrange',
+    'DarkSlateBlue', 'DarkViolet', 'DarkSeaGreen', 'GoldenRod'];
 
   private tmrCnt = 0;
 
-  msgEvent: Subject<Object>;
+  titleEvent: Subject<Object>;  //observable
+  msgEvent: Subject<Object>;  //observable to triggering data refresh
 
   constructor(private http: HttpClient) {
     console.log(this.range + ' ' + this.tmrCnt);
+    this.titleEvent = new Subject<Object>();
     this.msgEvent = new Subject<Object>();
     this.msgEvent.subscribe((data) => {
       this.range = parseInt(data.toString());
@@ -34,7 +35,7 @@ export class DataFeedService {
     //params
     let queryString = window.location.search;
     this.urlParams = new URLSearchParams(queryString);
-    if (this.urlParams.has('stocks'))
+    if (this.urlParams.has('stocks') && this.urlParams.get('stocks') != '')
       this.stocks = this.urlParams.get('stocks').split(',');
     if (this.urlParams.has('range'))
       this.range = parseInt(this.urlParams.get('range'));
@@ -67,21 +68,27 @@ export class DataFeedService {
     for (let s of stks) {
       promiseList.push(this.getStockDataDaily(s, moCnt));  //get single stock
     }
-    return Promise.all(promiseList).then(res => { res.map((r, i) => results.push(r)); return Promise.resolve(results); });
+    return Promise.all(promiseList)
+      .then(res => {
+        res.map((r, i) => results.push(r));  //merge results
+        return Promise.resolve(results);
+      });
   }
+
+  // curl "http://localhost:8080/?site=http://clicktocontinue.com/getwebdata.asp?https://query1.finance.yahoo.com/v7/finance/chart/DIA?range=1mo%26interval=1d%26indicators=quote%26includeTimestamps=true"
+  // curl "http://localhost:8080/?site=https://query1.finance.yahoo.com/v7/finance/chart/DIA?range=1mo%26interval=1d%26indicators=quote%26includeTimestamps=true"
 
   public getStockDataDaily(stk: string, rng: number): Promise<any> {
     console.log('getStockDataDaily');
     let unit = rng > 0 ? 'mo' : 'd'; //if negative, then days
     //let apiURL = `https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${moCnt}mo&interval=1d&indicators=quote&includeTimestamps=true`;
-    let apiURL = `http://clicktocontinue.com/getwebdata.asp?https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${Math.abs(rng)}${unit}&interval=1d&indicators=quote&includeTimestamps=true`;
+    //let apiURL = `http://clicktocontinue.com/getwebdata.asp?https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${Math.abs(rng)}${unit}&interval=1d&indicators=quote&includeTimestamps=true`;
+    let apiURL = `http://localhost:8080/?site=https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${Math.abs(rng)}${unit}%26interval=1d%26indicators=quote%26includeTimestamps=true`;
     let promise = new Promise((resolve, reject) => {
       this.http.get(apiURL)
         .toPromise()
         .then(
         res => { // Success
-          //console.log(res['chart']['result'][0]['timestamp'][0]);
-          //console.log(res['chart']['result'][0]['indicators']['adjclose'][0]['adjclose'][0]);
             resolve({ stockName:stk, range: rng, stockData: res });
           },
           msg => { // Error
@@ -95,14 +102,12 @@ export class DataFeedService {
 
   public getStockDataIntraday(stk: string, interval: number): Promise<any> {
     //let apiURL = `https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${moCnt}mo&interval=1d&indicators=quote&includeTimestamps=true`;
-    let apiURL = `http://clicktocontinue.com/getwebdata.asp?https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=1d&interval=${interval}m&indicators=quote&includeTimestamps=true`;
+    let apiURL = `http://localhost:8080/?site=https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=1d&interval=${interval}m&indicators=quote&includeTimestamps=true`;
     let promise = new Promise((resolve, reject) => {
       this.http.get(apiURL)
         .toPromise()
         .then(
           res => { // Success
-            //console.log(res['chart']['result'][0]['timestamp'][0]);
-            //console.log(res['chart']['result'][0]['indicators']['quote'][0]['close'][0]);
             resolve({ stockName: stk, moCnt: interval, stockData: res });
           },
           msg => { // Error
@@ -120,7 +125,9 @@ export class DataFeedService {
     let prc = data['chart']['result'][0]['indicators']['adjclose'][0]['adjclose']; //close price
     let vol = data['chart']['result'][0]['indicators']['quote'][0]['volume'];
     const zip = (a1, a2) => a1.map((v1, i) => [this.getDateMonthDay(v1), parseFloat(a2[i])]);
-    let stkData = zip(ts, prc);
+    let stkData = zip(ts, prc); //pair timestamp with price
+
+    //set chart object data
     chrtCmpt.stockData = zip(ts, prc);
     chrtCmpt.chart.data = stkData; //this.stockData;
     chrtCmpt.chart.maxVal = stkData[0][1];
@@ -138,21 +145,22 @@ export class DataFeedService {
     chrtCmpt.chart.chg = stkData[stkData.length - 1][1] - stkData[stkData.length - 2][1];
     chrtCmpt.chart.chgPct = chrtCmpt.chart.chg / stkData[stkData.length - 2][1] * 100.0;
     chrtCmpt.chart.lastTime = this.getTime(ts[ts.length - 1]);
-    chrtCmpt.chart.title = chrtCmpt.stockName + '  ' + chrtCmpt.chart.last.toFixed(2) + '  (' + chrtCmpt.chart.minVal.toFixed(2) + ' - ' + chrtCmpt.chart.maxVal.toFixed(2) + ')';
+    chrtCmpt.chart.info = chrtCmpt.chart.last.toFixed(2) + '  (' + chrtCmpt.chart.minVal.toFixed(2) + ' - ' + chrtCmpt.chart.maxVal.toFixed(2) + ')';
     chrtCmpt.chart.options.vAxis.baseline = this.baseline;
   }
 
   public parseJsonMulti(data, chrtCmpt, normalize = true): void {
-    let ttl = "";
+    let ttl = '';
     let colNames = ['Price'];
     let ts = data[0]['stockData']['chart']['result'][0]['timestamp']; //timestamps
-    //let prc = data['stockData']['chart']['result'][0]['indicators']['adjclose'][0]['adjclose']; //close price
     let stkData = [];
     const zip = (a1, a2) => a1.map((v1, i) => v1.push(parseFloat(a2[i].toFixed(2))));
-    //add time stamps
+
+    //add time stamps from first result
     for (let x of data[0]['stockData']['chart']['result'][0]['timestamp'])
       stkData.push([this.getDateMonthDay(x)]);
-    //add prices
+
+    //add prices from each result
     for (let dset of data) {
       ttl += dset.stockName + ' '
       if (dset['stockData']['chart']['result']) {
@@ -163,17 +171,16 @@ export class DataFeedService {
 
     if (normalize) //range 0-100
     {
-      //console.log(stkData);
+      //get max value from each result
       let maxnum = [0];
       for (let i = 1; i < stkData[0].length; i++) maxnum.push(stkData[0][i]);
 
       for (let r of stkData)
         for (let i = 1; i < r.length; i++)
           if (parseFloat(r[i]) > maxnum[i]) maxnum[i] = parseFloat(r[i]);
-      //console.log(maxnum);
+
       for (let r of stkData)
         for (let i = 1; i < r.length; i++) {
-          //console.log(r);
           r[i] = parseFloat(r[i]) / maxnum[i] * 100;
         }
     }
@@ -185,7 +192,7 @@ export class DataFeedService {
     chrtCmpt.stockData = stkData;
     chrtCmpt.chart.data = stkData; //this.stockData;
     chrtCmpt.chart.maxVal = 100.0;  //parseFloat(stkData[0][1]);
-   // chrtCmpt.chart.minVal = parseFloat(stkData[0][1]);
+
     for (let x of stkData) {
       if (x[1] > chrtCmpt.chart.maxVal) chrtCmpt.chart.maxVal = x[1];
       if (x[1] < chrtCmpt.chart.minVal) chrtCmpt.chart.minVal = x[1];
@@ -200,16 +207,18 @@ export class DataFeedService {
       totals[r] = totRow; //sum all stocks
       if (totRow < totMin) totMin = totRow;
     }
+
     chrtCmpt.chart.minVal = totMin / (stkData[0].length - 1);
 
-    avgLast = totals[totals.length-1] / (stkData[stkData.length - 1].length - 1.0);
-    chrtCmpt.chart.last = avgLast;  // parseFloat(stkData[stkData.length - 1][1]);
+    avgLast = totals[totals.length - 1] / (stkData[stkData.length - 1].length - 1.0);
+
+    //set chart object data
+    chrtCmpt.chart.last = avgLast;
     chrtCmpt.factor = 100.0 / avgLast; //assume normalized
     chrtCmpt.chart.chg = (totals[totals.length - 1] - totals[totals.length - 2]) / (stkData[stkData.length - 1].length - 1.0);
     chrtCmpt.chart.chgPct = chrtCmpt.chart.chg / (totals[totals.length-2]/(stkData[stkData.length - 1].length - 1.0)) * 100.0;
     chrtCmpt.chart.lastTime = this.getTime(ts[ts.length - 1]);
-    chrtCmpt.chart.title = chrtCmpt.chart.last.toFixed(2) + '  (' + chrtCmpt.chart.minVal.toFixed(2) + ' - ' + chrtCmpt.chart.maxVal.toFixed(2) + ')';
-    //ttl; //chrtCmpt.stockName + '  ' + chrtCmpt.chart.last.toFixed(2) + '  (' + chrtCmpt.chart.minVal.toFixed(2) + ' - ' + chrtCmpt.chart.maxVal.toFixed(2) + ')';
+    chrtCmpt.chart.info = chrtCmpt.chart.last.toFixed(2) + '  (' + chrtCmpt.chart.minVal.toFixed(2) + ' - ' + chrtCmpt.chart.maxVal.toFixed(2) + ')';
     chrtCmpt.chart.factor = 100.0 / avgLast;
     chrtCmpt.chart.options.vAxis.baseline = this.baseline;
  }

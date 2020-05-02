@@ -1,7 +1,7 @@
-<div style="border:dashed red 1px;margin:0.5em;padding:0.5em" (window:resize)="onResize($event)" (window:load)="onLoad($event)">
+<div style="border:dashed orange 1px;margin:0.4em;padding:0.5em" (window:resize)="onResize($event)" (window:load)="onLoad($event)">
 
-  <div *ngIf="chart.title && chart.title[0] !== '!'">
-    <b><span>{{ chart.title }}</span>&nbsp;&nbsp;&nbsp;<span style="color: {{ chart.chg < 0.0 ? 'maroon' : 'forestgreen' }}">{{ chart.chg.toFixed(2) }}&nbsp;&nbsp;{{ chart.chgPct.toFixed(2) }}%</span>&nbsp;&nbsp;&nbsp;{{ chart.factor.toFixed(2) }}x&nbsp;&nbsp;&nbsp;Vol {{ chart.avgVol/1000 }}k</b>&nbsp;&nbsp;&nbsp;{{ chart.lastTime }}
+  <div *ngIf="chart.info && chart.info[0] !== '!'">
+    <b><span style="color:darkcyan">{{ stockName }}</span>&nbsp;&nbsp;&nbsp;<span>{{ chart.info }}</span>&nbsp;&nbsp;&nbsp;<span style="color: {{ chart.chg < 0.0 ? 'maroon' : 'forestgreen' }}">{{ chart.chg.toFixed(2) }}&nbsp;&nbsp;{{ chart.chgPct.toFixed(2) }}%</span>&nbsp;&nbsp;&nbsp;{{ chart.factor.toFixed(2) }}x&nbsp;&nbsp;&nbsp;Vol {{ chart.avgVol/1000 }}k</b>&nbsp;&nbsp;&nbsp;{{ chart.lastTime }}
 
     <google-chart width="{{ chart.width }}"
                   [type]="chart.type"

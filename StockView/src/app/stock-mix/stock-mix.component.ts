@@ -15,16 +15,17 @@ export class StockMixComponent implements OnInit {
 
   public chart = {
     title: 'Mixed',
+    info: '',
     type: 'LineChart',
     data: [['Loading...', 0]],
-    columnNames: ['Price',...this.feed.stocks],   //['Price', 'MFA', 'NCLH', 'CHEF'],
+    columnNames: ['Price', ...this.feedsvc.stocks],   //['Price', 'MFA', 'NCLH', 'CHEF'],
     options: {
       legend: { position: 'top' },
       title: { position: 'top' },
       chartArea: { left: 50, right: 5 },
       hAxis: { gridLines: { color: '#333', minSpacing: 20 } },
       vAxis: { baseline: null },
-      colors: this.feed.lineColors
+      colors: this.feedsvc.lineColors
     },
     width: 1000,
     height: 1500,
@@ -34,38 +35,38 @@ export class StockMixComponent implements OnInit {
     loaded: false
   };
 
-  constructor(private feed: DataFeedService) {}
+  constructor(private feedsvc: DataFeedService) {}
 
   ngOnInit(): void {
-    //this.feed.getStockDataDaily(this.stockName, 6)
-    //  .then(r => { this.feed.parseJson(r, this); });
-    //this.feed.getStockDataIntraday(this.stockName, 15)
-    //  .then(r => { this.stockData = JSON.stringify(r); console.log(r); });
-    //this.feed.getStockDataDailyMix(['MFA', 'NCLH', 'CHEF'], 6).then(r => { this.stockData = JSON.stringify(r); console.log('res='+r); });
-    this.feed.getStockDataDailyMix(this.feed.stocks, this.feed.range).then(r => {
-      this.feed.parseJsonMulti(r, this);
-      window.dispatchEvent(new Event('resize'));
-      this.chart.loaded = true;
+    //get chart data
+    this.feedsvc.getStockDataDailyMix(this.feedsvc.stocks, this.feedsvc.range).then(r => {
+      this.feedsvc.parseJsonMulti(r, this);
+      window.dispatchEvent(new Event('resize')); //chart object does not resize automatically
+      this.chart.loaded = true; //show chart
+      this.feedsvc.titleEvent.next('SV ' + this.chart.chgPct.toFixed(2) + '%');
     });
 
-    this.feed.msgEvent.subscribe((data) => {
-      this.feed.getStockDataDailyMix(this.feed.stocks, this.feed.range).then(r => { this.feed.parseJsonMulti(r, this); window.dispatchEvent(new Event('resize')); });
-    });
+    this.feedsvc.msgEvent.subscribe((data) => {
+      this.feedsvc.getStockDataDailyMix(this.feedsvc.stocks, this.feedsvc.range)
+        .then(r => {
+          this.feedsvc.parseJsonMulti(r, this);
+          window.dispatchEvent(new Event('resize'));
 
+          this.feedsvc.titleEvent.next('SV ' + this.chart.chgPct.toFixed(2) + '%'); //trigger observable
+        });
+    });
   }
 
   ngAfterViewInit(): void {
-    //this.chart.width = 500;  //this.el.nativeElement.offsetWidth - 50;
     setTimeout(()=> window.dispatchEvent(new Event('resize')), 500);
   }
 
   onResize(event) {
-    //console.log(event.target.innerWidth);
     this.chart.width = event.target.innerWidth - 50;
   }
 
   onLoad(event) {
-    //console.log(event.target.innerWidth);
     this.chart.width = event.target.innerWidth - 50;
+    this.feedsvc.titleEvent.next('SV');
   }
 }
