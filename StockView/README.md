@@ -22,6 +22,9 @@ The charts are from Google Charts (line chart) using the [angular-google-charts]
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
+## Server Redirect
+Angular will throw a CORS error if loading data from an external site. A way around this is to provide a redirect endpoint on your local server. This project uses a small js server (StockView/server/server.js) for calling http://localhost:8080/?site=<data feed call> instead of calling the data feed directly. The local server adds an Access-Control-Allow-Origin header to allow the feed to work. The redirect only works with GET calls.
+
 ## Code scaffolding
 
 Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
