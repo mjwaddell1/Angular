@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
+import { getLocaleFirstDayOfWeek } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
@@ -46,17 +47,27 @@ export class DataFeedService {
 
     //set refresh
     if (this.refreshRate > 0)
-      setInterval(this.timerCheck, 60000, this); //check every minute
+      setInterval(() => this.timerCheck(), 60000, this); //check every minute
   }
 
-  private timerCheck(svc): void {
-    console.log('timer check ' + svc.tmrCnt + ' ' + svc.refreshRate);
-    if (++svc.tmrCnt >= svc.refreshRate) {
-      svc.tmrCnt = 0;
+  private timerCheck(): void {
+    console.log('timer check ' + this.tmrCnt + ' ' + this.refreshRate);
+    if (!this.isMarketOpen()) { this.tmrCnt === this.refreshRate; return; } //refresh immediately at market open
+    if (++this.tmrCnt >= this.refreshRate) {
+      this.tmrCnt = 0;
       console.log('trigger');
-      svc.msgEvent.next(svc.range);  //trigger refresh
+      this.msgEvent.next(this.range);  //trigger refresh
     }
-}
+  }
+
+  public isMarketOpen(): boolean {
+    //M-F, 9:30 - 4:30, 30 minute buffer
+    var curTime = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
+    if ([0, 6].includes(curTime.getDay())) return false; //Sat, Sun
+    var mktOpen = new Date(new Date(curTime).setHours(9, 30, 0, 0));
+    var mktClose = new Date(new Date(curTime).setHours(16, 30, 0, 0)); //extra time for delayed pricing
+    return (curTime >= mktOpen && curTime <= mktClose);
+  }
 
   public getStockList():string[] {
     return this.stocks;
@@ -75,14 +86,14 @@ export class DataFeedService {
       });
   }
 
-  // curl "http://cc.com/getwebdata.asp?https://query1.finance.yahoo.com/v7/finance/chart/DIA?range=1mo%26interval=1d%26indicators=quote%26includeTimestamps=true"
+  // curl "http://localhost:8080/?site=http://clicktocontinue.com/getwebdata.asp?https://query1.finance.yahoo.com/v7/finance/chart/DIA?range=1mo%26interval=1d%26indicators=quote%26includeTimestamps=true"
   // curl "http://localhost:8080/?site=https://query1.finance.yahoo.com/v7/finance/chart/DIA?range=1mo%26interval=1d%26indicators=quote%26includeTimestamps=true"
 
   public getStockDataDaily(stk: string, rng: number): Promise<any> {
     console.log('getStockDataDaily');
     let unit = rng > 0 ? 'mo' : 'd'; //if negative, then days
     //let apiURL = `https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${moCnt}mo&interval=1d&indicators=quote&includeTimestamps=true`;
-    //let apiURL = `http://cc.com/getwebdata.asp?https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${Math.abs(rng)}${unit}&interval=1d&indicators=quote&includeTimestamps=true`;
+    //let apiURL = `http://clicktocontinue.com/getwebdata.asp?https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${Math.abs(rng)}${unit}&interval=1d&indicators=quote&includeTimestamps=true`;
     let apiURL = `http://localhost:8080/?site=https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${Math.abs(rng)}${unit}%26interval=1d%26indicators=quote%26includeTimestamps=true`;
     let promise = new Promise((resolve, reject) => {
       this.http.get(apiURL)
