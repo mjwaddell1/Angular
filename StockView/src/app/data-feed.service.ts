@@ -10,7 +10,9 @@ export class DataFeedService {
 
   //http://localhost:4200/?stocks=DIA,SPY,QQQ&range=6&refresh=5&baseline=0
 
-  public stocks: string[] = ['DIA', 'SPY', 'QQQ', 'IWM']; //DOW, S&P500, Nasdaq, Russell 2k
+  private redirectUrl = 'http://localhost:8080/?site='; // prevent CORS error (.../StockView/server/server.js). GET only.
+
+  public stocks: string[] = ['DIA', 'SPY', 'QQQ', 'IWM']; //default - DOW, S&P500, Nasdaq, Russell 2k
   public range: number = 6;  //months
   public refreshRate: number = 10; //minutes
   public baseline: number = 0; //chart bottom
@@ -52,7 +54,10 @@ export class DataFeedService {
 
   private timerCheck(): void {
     console.log('timer check ' + this.tmrCnt + ' ' + this.refreshRate);
+
+    // skip refresh if market closed
     if (!this.isMarketOpen()) { this.tmrCnt === this.refreshRate; return; } //refresh immediately at market open
+
     if (++this.tmrCnt >= this.refreshRate) {
       this.tmrCnt = 0;
       console.log('trigger');
@@ -60,7 +65,7 @@ export class DataFeedService {
     }
   }
 
-  public isMarketOpen(): boolean {
+  public isMarketOpen(): boolean {  // NYSE hours
     //M-F, 9:30 - 4:30, 30 minute buffer
     var curTime = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }));
     if ([0, 6].includes(curTime.getDay())) return false; //Sat, Sun
@@ -86,15 +91,14 @@ export class DataFeedService {
       });
   }
 
-  // curl "http://localhost:8080/?site=http://clicktocontinue.com/getwebdata.asp?https://query1.finance.yahoo.com/v7/finance/chart/DIA?range=1mo%26interval=1d%26indicators=quote%26includeTimestamps=true"
   // curl "http://localhost:8080/?site=https://query1.finance.yahoo.com/v7/finance/chart/DIA?range=1mo%26interval=1d%26indicators=quote%26includeTimestamps=true"
 
   public getStockDataDaily(stk: string, rng: number): Promise<any> {
     console.log('getStockDataDaily');
     let unit = rng > 0 ? 'mo' : 'd'; //if negative, then days
     //let apiURL = `https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${moCnt}mo&interval=1d&indicators=quote&includeTimestamps=true`;
-    //let apiURL = `http://clicktocontinue.com/getwebdata.asp?https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${Math.abs(rng)}${unit}&interval=1d&indicators=quote&includeTimestamps=true`;
-    let apiURL = `http://localhost:8080/?site=https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${Math.abs(rng)}${unit}%26interval=1d%26indicators=quote%26includeTimestamps=true`;
+    //let apiURL = `http://cc.com/getwebdata.asp?https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${Math.abs(rng)}${unit}&interval=1d&indicators=quote&includeTimestamps=true`;
+    let apiURL = this.redirectUrl + `https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${Math.abs(rng)}${unit}%26interval=1d%26indicators=quote%26includeTimestamps=true`;
     let promise = new Promise((resolve, reject) => {
       this.http.get(apiURL)
         .toPromise()
@@ -113,7 +117,7 @@ export class DataFeedService {
 
   public getStockDataIntraday(stk: string, interval: number): Promise<any> {
     //let apiURL = `https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=${moCnt}mo&interval=1d&indicators=quote&includeTimestamps=true`;
-    let apiURL = `http://localhost:8080/?site=https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=1d&interval=${interval}m&indicators=quote&includeTimestamps=true`;
+    let apiURL = this.redirectUrl + `https://query1.finance.yahoo.com/v7/finance/chart/${stk}?range=1d&interval=${interval}m&indicators=quote&includeTimestamps=true`;
     let promise = new Promise((resolve, reject) => {
       this.http.get(apiURL)
         .toPromise()
