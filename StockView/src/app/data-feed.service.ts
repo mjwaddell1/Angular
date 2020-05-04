@@ -24,7 +24,7 @@ export class DataFeedService {
 
   private tmrCnt = 0;
 
-  titleEvent: Subject<Object>;  //observable
+  titleEvent: Subject<Object>;  //observable for page title changes
   msgEvent: Subject<Object>;  //observable to triggering data refresh
 
   constructor(private http: HttpClient) {
